@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>62 HD</title>
+        
+        <link rel="stylesheet" href="http://dev.openlayers.org/examples/style.css" type="text/css">
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="css/jqueryUI.css" type="text/css">
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.css" type="text/css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.js"></script>
+		
+		<!-- script for using google base layer -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCTN3rYFeoyUMSkukPyaCaW0DP9vvD9gbs"></script>
+		<script src="http://mapgears.github.io/ol3-google-maps/examples/dist/ol3gm.js"></script>
+		
+		<script src="test/cluster_test.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+				font-family:'Malgun Gothic';
+			}
+			#map {
+				width:1553px;
+				height:930px;
+				float: left;
+				z-index: 1;
+			}
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			table {
+				border-collapse: collapse;
+				width: 240px;
+				
+			}
+			tr:nth-child(even) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				background: #f0f6f9;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+			a {
+				text-decoration:none;
+			}
+
+		</style>
+		<script>
+			$(document).ready(function(){
+				$('#datagokr').click(function(){
+					$('iframe').attr('src','https://www.data.go.kr/');
+				});
+				
+				$('#datagov').click(function(){
+					$('iframe').attr('src','https://www.data.gov?embed=yes');
+				});
+				
+				$('#datagojp').click(function(){
+					$('iframe').attr('src','http://www.data.go.jp/');
+				});
+				
+				$('#noaa').click(function(){
+					$('iframe').attr('src','https://www.climate.gov/');
+				});
+				
+				$('#eume').click(function(){
+					$('iframe').attr('src','https://www.eumetsat.int/website/home/index.html');
+				});
+				
+				$('#sedac').click(function(){
+					$('iframe').attr('src','http://sedac.ciesin.columbia.edu/');
+				});
+				
+				$('#global').click(function(){
+					$('iframe').attr('src','http://preview.grid.unep.ch/');
+				});
+				
+				$('#geoss').click(function(){
+					$('iframe').attr('src','http://www.geoportal.org/');
+				});
+				
+				$('#ihp').click(function(){
+					$('iframe').attr('src','http://ihp-wins.unesco.org/');
+				});
+				
+				$('#lis').click(function(){
+					$('iframe').attr('src','https://lis.gsfc.nasa.gov/');
+				});
+				
+				$('#pmm').click(function(){
+					$('iframe').attr('src','https://pmm.nasa.gov/');
+				});
+				
+				$('#geosec').click(function(){
+					$('iframe').attr('src','http://earthobservations.org/index2.php');
+				});
+				
+				$('#unesco').click(function(){
+					$('iframe').attr('src','http://globalwaterquality.org/');
+				});
+				
+				$('#tethys').click(function(){
+					$('iframe').attr('src','http://www.tethysplatform.org/');
+				});
+				
+				$('#jaxa').click(function(){
+					$('iframe').attr('src','http://global.jaxa.jp/');
+				});
+				
+			})
+		</script>
+    </head>
+    <body>
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray;">
+				<div style="width: 1918px; height: 134px; text-align: center;">
+					<img src="img/new/62/62.png" style="width: 1918px;">
+				</div>
+
+				<div id="leftMenu" style="width: 350px; height: 930px; margin: 3px; border: 1px solid gray; float: left; background-color: #f1f1f1; text-align: center;">
+				<div style="width: 328px; height: 899px; text-align: center; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<div id="datagokr" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">대한민국 공공데이터 포털</a></div>
+					
+					<!--<div id="datagov" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">미국 데이터 포털(X)</a></div>-->
+					
+					<!--<div id="datagojp" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">일본 데이터 포털(X)</a></div>-->
+					
+					<!--<div id="noaa" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">NOAA Climate(X)</a></div>-->
+					
+					<div id="eume" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">EUMETSAT</a></div>
+					
+					<div id="sedac" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">NASA SEDAC</a></div>
+					
+					<div id="global" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">Global Risk Data Platform</a></div>
+					
+					<!--<div id="geoss" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">GEOSS(X)</a></div>-->
+					
+					<!--<div id="ihp" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">IHP-WINS(X)</a></div>-->
+					
+					<!--<div id="lis" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">NASA LIS(X)</a></div>-->
+					
+					<!--<div id="pmm" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">NASA PMM(X)</a></div>-->
+					
+					<div id="geosec" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">GEOSEC</a></div>
+					
+					<!--<div id="unesco" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">UNESCO(X)</a></div>-->
+					
+					<div id="tethys" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">Tethys Platform</a></div>
+					
+					<div id="jaxa" style="font-size: 20px; width: 240px; margin:0 auto; margin-top: 29px;"><a href="#">JAXA</a></div>
+				</div>
+				</div>
+				<div style="height: 4px;"></div>
+				<div id="map">
+					<iframe src="https://www.data.go.kr/" frameborder="0" width="1550" height="925" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+				</div>
+				
+
+		</div>
+
+    </body>
+</html>
+
+
+
+
+
+

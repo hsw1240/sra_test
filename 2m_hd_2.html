@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>2M HD</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="http://210.92.123.150/monitoring/new/css/jqueryUI.css">
+		<link rel="stylesheet" href="OpenLayers/theme/default/style.css" type="text/css">
+		
+		<script src="http://maps.google.com/maps/api/js?v=3&amp;key=AIzaSyAQCzOrBz8akZ39UtNv4Q9eeacmndZ-Ca0"></script>
+		<script src="http://dev.openlayers.org/OpenLayers.js"></script>
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+				font-family:'Malgun Gothic';
+			}
+			#map {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			
+			table {
+				border-collapse: collapse;
+				border-radius: 15px;
+				margin-left: 1px;
+			}
+			tr:nth-child(odd) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				margin-left: 350px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+			
+			#metaTable tr {
+				height: 40px;
+			}
+
+
+		</style>
+        <script>
+		
+		</script>
+    </head>
+    <body>
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray;">
+		
+			<div id="q_pop" style="width: 40px; height: 40px; background-color: red; opacity: 0; position: absolute; z-index: 999; margin-top: 83px; margin-left: 580px; cursor: pointer;"></div>
+			
+			<div id="img_pop" style="width: 400px; height: 156px; background-color: #fff; position: absolute; z-index: 999; border: 1px solid gray; border-radius: 15px; right: 2%; margin-top: 160px; display: none;">
+				<img src="img/new/2m/legend.png" style="width: 400px; border-radius: 15px;">
+			</div>
+			
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<img src="img/new/2m/2m_title.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 62px;">
+				<a href="#"><img src="img/new/2m/tab1_1.png" style="width: 959px;"></a>
+				<a href="2m_hd.html"><img src="img/new/2m/tab1_2.png" style="width: 959px; margin-left: -6px;"></a>
+			</div>
+			
+			<div id="leftMenu" style="width: 350px; height: 938px; background-color: #e8e8e8; float: left; position: absolute; z-index: 999; display: block;">
+				
+				<div style="width: 328px; height: 180px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<!--<div style="height: 18px; background-color: #1c3aa6; color: #fff; font-size: 10px; line-height: 18px;">제어 창</div>-->
+					<div style="height: 25px; margin-top: 20px;"><span style="float: left; margin-left: 15px; font-size: 14px; font-weight: bold;">날짜 선택</span></div>
+					
+					<div style="font-size: 11px; margin-top: 10px; width: 230px; text-align: left; margin-left: 15px;">
+						<div style="height: 35px;">
+							<input type="text" name="yyyy1" value="년도" style="width: 80px; height: 25px;">
+							<input type="text" name="mm1" value="월" style="width: 40px; height: 25px;">
+							<input type="text" name="dd1" value="일" style="width: 40px; height: 25px;" style="margin-right: 5px;">
+							<input type="hidden" id="datepicker1"> ~
+						</div>
+						<div style="height: 35px; margin-top: 5px;">
+							<input type="text" name="yyyy2" value="년도" style="width: 80px; height: 25px;">
+							<input type="text" name="mm2" value="월" style="width: 40px; height: 25px;">
+							<input type="text" name="dd2" value="일" style="width: 40px; height: 25px;">
+							<input type="hidden" id="datepicker2">
+						</div>
+					</div>
+					
+					<input type="hidden" id="date1">
+					<input type="hidden" id="date2">
+
+					<div style="float: right; margin-top: 3px; margin-right: 25px;">
+						<button id="dateBtId" class="button button2">적용</button>
+					</div>
+					
+				</div>
+
+				<div style="width: 328px; height: 303px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+
+					<div style="margin: 8px;">
+					<table id="metaTable" style="width: 311px; font-size: 15px;">
+						<tr>
+							<th>INPUT_DATA</th>
+							<td>SOIL MOISTURE</td>
+						</tr>
+						<tr>
+							<th>OUTPUT_DATA</th>
+							<td>SOIL MOISTURE INDEX</td>
+						</tr>
+						<tr>
+							<th>VALUE_RANGE</th>
+							<td>0~5, -999(NAN)</td>
+						</tr>
+						<tr>
+							<th rowspan=2>SPATIAL_RANGE</th>
+							<td>LONG: 124º~132º</td>
+						</tr>
+						<tr>
+							<td>LAT: 33º~44º</td>
+						</tr>
+						<tr>
+							<th>SPATIAL_<br>RESOLUTION</th>
+							<td>0.01 Degree</td>
+						</tr>
+						<tr>
+							<th>TIME_INTERVAL</th>
+							<td>1 Day</td>
+						</tr>
+					</table>
+					</div>
+				</div>
+				<div style="width: 328px; height: 200px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<img id="chartId" src="../ftproot/flooddb01/20161101.wet_mask.chart.png" style="width: 328px; height: 200px; border-radius: 15px;">
+				</div>
+				
+				<div style="width: 328px; height: 166px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<img id="" src="img/new/2m/legend.png" style="width: 328px; height: 166px; border-radius: 15px;">
+				</div>
+			</div>
+			
+			<div id="toggleBtn" style="display: block;"><img src="img/left207.png" style="margin-left: 5px;"></div>
+			
+			<div id="map" class="targetMap">
+				<div id="dateTxt" class="text_border" style="position: absolute; z-index: 999; font-size: 23px; color: #fff; margin-left: 810px; margin-top: 20px;"></div>
+			</div>
+			
+			<div id="marker" title="Marker" style="display:none;"></div>
+		</div>
+		<script>
+			
+			var map;
+			
+			$("input[name$='yyyy1']").val("2017");
+			$("input[name$='mm1']").val("01");
+			$("input[name$='dd1']").val("01");
+
+			$("input[name$='yyyy2']").val("2018");
+			$("input[name$='mm2']").val("04");
+			$("input[name$='dd2']").val("14");
+			
+			$("#datepicker1").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date1").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy1']").val(yymmdd[0]);
+					$("input[name$='mm1']").val(yymmdd[1]);
+					$("input[name$='dd1']").val(yymmdd[2]);
+				}
+			});
+			$("#datepicker2").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date2").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy2']").val(yymmdd[0]);
+					$("input[name$='mm2']").val(yymmdd[1]);
+					$("input[name$='dd2']").val(yymmdd[2]);
+				}
+			});
+
+			
+			// 레이아웃 제어 left show hide
+			var leftShow = false;
+			$("#toggleBtn").click(function(){
+				
+				//$("#leftMenu").toggle('slide');
+				$("#leftMenu").toggle();
+				
+				if(leftShow){
+					$("#toggleBtn").css('margin-left','350px');
+					$('#toggleBtn img').attr('src','img/left207.png');
+					
+					leftShow = false;
+				}else{
+					$("#toggleBtn").css('margin-left','0px');
+					$('#toggleBtn img').attr('src','img/right218.png');
+					
+					leftShow = true;
+				}
+			})
+			
+			/*$('#q_pop').click(function(){
+				$('#img_pop').toggle();
+			})
+			
+			$('#img_pop').click(function(){
+				$(this).hide();
+			});*/
+			
+			map = new OpenLayers.Map('map', {
+				projection: 'EPSG:3857',
+				layers: [
+					new OpenLayers.Layer.Google(
+						"Google Satellite",
+						{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+					),
+					new OpenLayers.Layer.Google(
+						"Google Streets", // the default
+						{numZoomLevels: 20}
+					),
+					new OpenLayers.Layer.Google(
+						"Google Physical",
+						{type: google.maps.MapTypeId.TERRAIN}
+					),
+					new OpenLayers.Layer.Google(
+						"Google Hybrid",
+						{type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+					)
+					
+				],
+				center: new OpenLayers.LonLat(14164481.162731,4655382.0328318),
+					// Google.v3 uses web mercator as projection, so we have to
+					// transform our coordinates
+					//.transform('EPSG:4326', 'EPSG:900913'),
+				zoom: 6,
+				numZoomLevels:19
+			});
+			
+			//vBase = new vworld.Layers.Base('브이월드');
+			//if (vBase != null){map.addLayer(vBase)};
+			
+
+			map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+		</script>
+		
+		
+		<script src="js/animation/animation_flood.js"></script>
+		<script src="js/common/etc.js"></script>
+		<!--<script src="js/animation/2m_large.js"></script>
+		<script src="js/river.js"></script>-->
+    </body>
+</html>
+
+
+
+
+
+

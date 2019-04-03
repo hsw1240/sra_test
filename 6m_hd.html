@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>6M HD</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="http://210.92.123.150/monitoring/new/css/jqueryUI.css">
+		<link rel="stylesheet" href="OpenLayers/theme/default/style.css" type="text/css">
+		
+		<script src="http://maps.google.com/maps/api/js?v=3&amp;key=AIzaSyAQCzOrBz8akZ39UtNv4Q9eeacmndZ-Ca0"></script>
+		<script src="http://dev.openlayers.org/OpenLayers.js"></script>
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+			}
+			#map {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			table {
+				border-collapse: collapse;
+				border-radius: 15px;
+				width: 327px;
+				margin-left: 1px;
+			}
+			tr:nth-child(even) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+			
+
+
+		</style>
+        <script>
+		
+		</script>
+    </head>
+    <body>
+		<div class="centerDiv" style="width:1918px; height: 2180px; border: 1px solid gray;">
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<img src="img/new/6m/6m_title.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 67px;">
+				<a href="6m_hd_portal.html"><img src="img/new/6m/6m_tab_1_1.png" style="width: 959px;"></a>
+				<a href="#"><img src="img/new/6m/6m_tab_2_2.png" style="width: 959px; margin-left: -6px;"></a>
+			</div>
+			
+			<div style="width: 1915px; height: 2040px; margin-top: 5px;">
+				<iframe src="http://1.227.166.166:9132/monitoring/data.html" scrolling="no" width="1915" height="2040" frameborder="0"></iframe>
+			</div>
+			
+			<!--<div style="width: 1915px; height: 1030px; margin-top: 5px; overflow-x:hidden; overflow-y:hidden;">
+				<iframe src="http://210.92.123.150/monitoring/data.html" scrolling="no" width="1915" height="1030" frameborder="0"></iframe>
+			</div>-->
+
+		</div>
+		<script>
+		
+			
+			$("input[name$='yyyy1']").val(yyyy);
+			$("input[name$='mm1']").val(mm);
+			$("input[name$='dd1']").val(dd);
+
+			$("input[name$='yyyy2']").val(yyyy);
+			$("input[name$='mm2']").val(mm);
+			$("input[name$='dd2']").val(dd);
+			
+			$("#datepicker1").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date1").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy1']").val(yymmdd[0]);
+					$("input[name$='mm1']").val(yymmdd[1]);
+					$("input[name$='dd1']").val(yymmdd[2]);
+				}
+			});
+			$("#datepicker2").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date2").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy2']").val(yymmdd[0]);
+					$("input[name$='mm2']").val(yymmdd[1]);
+					$("input[name$='dd2']").val(yymmdd[2]);
+				}
+			});
+			
+			// 레이아웃 제어 left show hide
+			var leftShow = false;
+			$("#toggleBtn").click(function(){
+				
+				//$("#leftMenu").toggle('slide');
+				$("#leftMenu").toggle();
+				
+				if(leftShow){
+					
+					$("#toggleBtn").css('margin-left','0px');
+					$('#toggleBtn img').attr('src','img/right218.png');
+					leftShow = false;
+				}else{
+					
+					$("#toggleBtn").css('margin-left','350px');
+					$('#toggleBtn img').attr('src','img/left207.png');
+					leftShow = true;
+				}
+			})
+		</script>
+		
+		
+		<script src="js/klis/6m_klis_map.js"></script>
+		<script src="js/klis/6m_2m_large_klis.js"></script>
+		<script src="js/klis/snZone.js"></script>
+    </body>
+</html>
+
+
+
+
+
+

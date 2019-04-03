@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>65 HD</title>
+        
+        <link rel="stylesheet" href="http://dev.openlayers.org/examples/style.css" type="text/css">
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+		<link rel="stylesheet" href="css/jqueryUI.css" type="text/css">
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.css" type="text/css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.js"></script>
+		
+		<!-- script for using google base layer -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCTN3rYFeoyUMSkukPyaCaW0DP9vvD9gbs"></script>
+		<script src="http://mapgears.github.io/ol3-google-maps/examples/dist/ol3gm.js"></script>
+		
+		<script src="test/cluster_test.js"></script>
+		
+		<!-- Data for dictionary -->
+		<script src="dictionary/dictionary.js"></script>
+	
+		<script src="js/datePicker.js"></script>
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+				font-family:'Malgun Gothic';
+			}
+			#map {
+				width:711px;
+				height:565px;
+				float: left;
+			}
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				cursor: pointer;
+				line-height: 22px;
+			}
+
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			
+			.li{
+				margin-top: 3px;
+			}
+
+		</style>
+
+		<script>
+		
+		var korn = [];
+		var engn = [];
+		var desc = [];
+		var resea = [];
+		var org = [];
+		var d_img = [];
+		
+			function make_dic(){
+				var list = "";
+			
+				for(var i=0; i<dic.length; i++){
+					
+					list = list + "<li><a href=\"javascript:callDes();\" style=\"font-size:14px;\">";
+					
+					korn.push(dic[i][1]);
+					engn.push(dic[i][2]);
+					desc.push(dic[i][3]);
+					resea.push(dic[i][4]);
+					org.push(dic[i][5]);
+					d_img.push(dic[i][2]);
+					
+					list = list + korn[i] + "</a><p style=\"color:#555;font-size:13px;margin-top:0px;margin-bottom:12px;\">" +
+							engn[i] + "</li>";
+					
+				}
+				
+				$("#dic").html(list);
+				
+			}
+			
+			function callDes(){
+				console.log("Call the description function.");
+			}
+		
+			$(document).ready(function(){
+			<!-- $("#dic").html("<li>"); -->
+				make_dic();
+			});
+		</script>
+    </head>
+    <body>
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray; text-align: center;">
+		
+			<div style="width: 1918px; height: 134px; text-align: center;">
+				<img src="img/65/65_title.png" style="width: 1918px;">
+			</div>
+			
+			<div style="width: 1918px; height: 937px; margin-top: 5px;">
+				<iframe src="http://210.92.123.150/monitoring/whap_intro_monitoring.html" scrolling="yes" width="1915" height="937" frameborder="0"></iframe>
+			</div>
+		
+
+		</div>
+
+    </body>
+</html>
+
+
+
+
+
+

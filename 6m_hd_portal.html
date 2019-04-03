@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>6M HD</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="http://210.92.123.150/monitoring/new/css/jqueryUI.css">
+		<link rel="stylesheet" href="OpenLayers/theme/default/style.css" type="text/css">
+		
+		<script src="http://maps.google.com/maps/api/js?v=3&amp;key=AIzaSyAQCzOrBz8akZ39UtNv4Q9eeacmndZ-Ca0"></script>
+		<script src="http://dev.openlayers.org/OpenLayers.js"></script>
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+			}
+			#map {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			
+			table {
+				border-collapse: collapse;
+				border-radius: 15px;
+				margin-left: 1px;
+			}
+			tr:nth-child(odd) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				margin-left: 350px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+			
+			#metaTable tr {
+				height: 40px;
+			}
+
+
+		</style>
+        <script>
+		
+		</script>
+    </head>
+    <body>
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray;">
+		
+			<div id="q_pop" style="width: 50px; height: 50px; background-color: red; opacity: 0; position: absolute; z-index: 999; margin-top: 80px; margin-left: 893px; cursor: pointer;"></div>
+			
+			<div id="img_pop" style="width: 400px; height: 156px; background-color: #fff; position: absolute; z-index: 999; border: 1px solid gray; border-radius: 15px; right: 2%; margin-top: 160px; display: none;">
+				<img src="img/ddi.png" style="width: 400px; border-radius: 15px;">
+			</div>
+			
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<img src="img/new/6m/6m_title.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 67px;">
+				<a href="#"><img src="img/new/6m/6m_tab_1.png" style="width: 959px;"></a>
+				<a href="6m_hd.html"><img src="img/new/6m/6m_tab_2.png" style="width: 959px; margin-left: -6px;"></a>
+			</div>
+			
+			<div id="leftMenu" style="width: 350px; height: 938px; background-color: #e8e8e8; float: left; position: absolute; z-index: 999; display: block;">
+				<div style="margin-top: 20px; margin-left: 10px; ">
+					<input type="radio" name="chk_name" value="kldas" checked="checked" style="margin: 5px; margin-left: 30px;"><font style="font-size: 22px;">KLDAS</font>
+					<input type="radio" name="chk_name" value="aldas" style="margin: 5px; margin-left: 80px;"><font style="font-size: 22px;">ALDAS</font>
+				</div>
+
+				<div style="width: 328px; height: 320px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					
+					
+					<div style="width: 328px; margin: 5px;">
+						<table id="r1" style="font-size: 12px;">
+							<tr>
+								<td><input type="radio" name="chk_name1" value="sr" checked="checked"><br>Evap</td>
+								<td><input type="radio" name="chk_name1" value="bum"><br>SoilMoist</td>
+								<td><input type="radio" name="chk_name1" value=""><br>SnowT</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Swnet</td>
+								<td><input type="radio" name="chk_name1" value=""><br>PotEvap</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Wind_f</td>
+							</tr>
+							<tr>
+								<td><input type="radio" name="chk_name1" value=""><br>Rainf</td>
+								<td><input type="radio" name="chk_name1" value=""><br>SoilTemp</td>
+								<td><input type="radio" name="chk_name1" value=""><br>VegT</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Lwnet</td>
+								<td><input type="radio" name="chk_name1" value=""><br>ECanop</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Rain_f</td>
+							</tr>
+							<tr>
+								<td><input type="radio" name="chk_name1" value=""><br>RainfConv</td>
+								<td><input type="radio" name="chk_name1" value=""><br>SoilWet</td>
+								<td><input type="radio" name="chk_name1" value=""><br>BareSoilT</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Qle</td>
+								<td><input type="radio" name="chk_name1" value=""><br>TVeg</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Snowf_f</td>
+							</tr>
+							<tr>
+								<td><input type="radio" name="chk_name1" value=""><br>TotalPrecip</td>
+								<td><input type="radio" name="chk_name1" value=""><br>RelSMC</td>
+								<td><input type="radio" name="chk_name1" value=""><br>AvgSurfT</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Qh</td>
+								<td><input type="radio" name="chk_name1" value=""><br>ESoil</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Tair_f</td>
+							</tr>
+							<tr>
+								<td><input type="radio" name="chk_name1" value=""><br>Qs</td>
+								<td><input type="radio" name="chk_name1" value=""><br>RootTemp</td>
+								<td><input type="radio" name="chk_name1" value=""><br>RadT</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Qg</td>
+								<td><input type="radio" name="chk_name1" value=""><br>CanopInt</td>
+								<td><input type="radio" name="chk_name1" value=""><br>Psurf_f</td>
+							</tr>
+						</table>
+					</div>
+					
+					
+					
+					
+					<div style="font-size: 11px; margin-top: 33px; width: 230px; text-align: left; margin-left: 37px;">
+						<div style="height: 35px;">
+							<input type="text" name="yyyy1" value="년도" style="width: 80px; height: 25px;">
+							<input type="text" name="mm1" value="월" style="width: 40px; height: 25px;">
+							<input type="text" name="dd1" value="일" style="width: 40px; height: 25px;" style="margin-right: 5px;">
+							<input type="hidden" id="datepicker1"> ~
+						</div>
+						<div style="height: 35px; margin-top: 5px;">
+							<input type="text" name="yyyy2" value="년도" style="width: 80px; height: 25px;">
+							<input type="text" name="mm2" value="월" style="width: 40px; height: 25px;">
+							<input type="text" name="dd2" value="일" style="width: 40px; height: 25px;">
+							<input type="hidden" id="datepicker2">
+						</div>
+					</div>
+					
+					<input type="hidden" id="date1">
+					<input type="hidden" id="date2">
+
+					<div style="float: right; margin-top: -28px; margin-right: 31px;">
+						<button id="dateBtId" class="button button2">적용</button>
+					</div>
+					
+				</div>
+				<div style="width: 328px; height: 303px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+						<!--<table>
+						<tr>
+							<th width="80" height="50">발생시점</th>
+							<td id="when" height="50" width="170"></td>
+						</tr>
+						<tr>
+							<th width="80" height="50">위치</th>
+							<td id="addr" height="50" width="170"></td>
+						</tr>
+						</table>
+						
+					<div style="height:25px; background-color: #3399cc; color: #fff; font-size: 15px; line-height: 18px;margin-top:3px;margin-bottom:3px;">▶ 선택 지점 목록</div>
+						
+						<div style="height: 375px;overflow-y: auto;overflow-x: hidden;">
+							<table id="clist">
+							</table>
+						</div>-->
+					<div style="margin: 8px;">
+					<table id="metaTable" style="width: 311px; font-size: 15px;">
+						<tr>
+							<th>INPUT_DATA</th>
+							<td>SOIL MOISTURE</td>
+						</tr>
+						<tr>
+							<th>OUTPUT_DATA</th>
+							<td>SOIL MOISTURE INDEX</td>
+						</tr>
+						<tr>
+							<th>VALUE_RANGE</th>
+							<td>0~5, -999(NAN)</td>
+						</tr>
+						<tr>
+							<th rowspan=2>SPATIAL_RANGE</th>
+							<td>LONG: 124º~132º</td>
+						</tr>
+						<tr>
+							<td>LAT: 33º~44º</td>
+						</tr>
+						<tr>
+							<th>SPATIAL_<br>RESOLUTION</th>
+							<td>0.01 Degree</td>
+						</tr>
+						<tr>
+							<th>TIME_INTERVAL</th>
+							<td>1 Day</td>
+						</tr>
+					</table>
+					</div>
+				</div>
+				<div style="width: 328px; height: 200px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<img src="./img/20170501.index.chart.png" style="width: 328px; height: 200px; border-radius: 15px;">
+				</div>
+			</div>
+			
+			<div id="toggleBtn" style="display: block;"><img src="img/left207.png" style="margin-left: 5px;"></div>
+			
+			<div id="map" class="targetMap">
+				<div id="dateTxt" class="text_border" style="position: absolute; z-index: 999; font-size: 23px; color: #fff; margin-left: 840px; margin-top: 20px;"></div>
+			</div>
+			
+			<div id="map2" class="targetMap" style="width:1915px; height:935px; float: left; z-index: 1; display: none;">
+				<iframe src="http://210.92.123.156:8080/Apps/WMS_test_cesium.html" scrolling="no" width="1915" height="935" frameborder="0"></iframe>
+			</div>
+			
+			<div id="marker" title="Marker" style="display:none;"></div>
+		</div>
+		<script>
+		
+			
+			$("input[name$='yyyy1']").val(yyyy);
+			$("input[name$='mm1']").val(mm);
+			$("input[name$='dd1']").val(dd);
+
+			$("input[name$='yyyy2']").val(yyyy);
+			$("input[name$='mm2']").val(mm);
+			$("input[name$='dd2']").val(dd);
+			
+			$("#datepicker1").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date1").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy1']").val(yymmdd[0]);
+					$("input[name$='mm1']").val(yymmdd[1]);
+					$("input[name$='dd1']").val(yymmdd[2]);
+				}
+			});
+			$("#datepicker2").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date2").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy2']").val(yymmdd[0]);
+					$("input[name$='mm2']").val(yymmdd[1]);
+					$("input[name$='dd2']").val(yymmdd[2]);
+				}
+			});
+
+			// kldas, aldas 라디오버튼 show hide
+			$('input:radio[name=chk_name]').change(function() {
+
+				if (this.value == 'kldas') {
+					$(".targetMap").hide();
+					$('#map').show();
+				} else if (this.value == 'aldas') {
+					$(".targetMap").hide();
+					$('#map2').show();
+				}
+				
+			});
+			
+			// 레이아웃 제어 left show hide
+			var leftShow = false;
+			$("#toggleBtn").click(function(){
+				
+				//$("#leftMenu").toggle('slide');
+				$("#leftMenu").toggle();
+				
+				if(leftShow){
+					$("#toggleBtn").css('margin-left','350px');
+					$('#toggleBtn img').attr('src','img/left207.png');
+					
+					leftShow = false;
+				}else{
+					$("#toggleBtn").css('margin-left','0px');
+					$('#toggleBtn img').attr('src','img/right218.png');
+					
+					leftShow = true;
+				}
+			})
+			
+			$('#q_pop').click(function(){
+				$('#img_pop').toggle();
+			})
+			
+			$('#img_pop').click(function(){
+				$(this).hide();
+			});
+		</script>
+		
+		
+		<script src="js/klis/6m_klis_map.js"></script>
+		<script src="js/klis/6m_2m_large_klis.js"></script>
+		<!--<script src="js/klis/snZone.js"></script>-->
+    </body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>X-net 36</title>
+        
+        <link rel="stylesheet" href="http://dev.openlayers.org/examples/style.css" type="text/css">
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="css/jqueryUI.css" type="text/css">
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.css" type="text/css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.js"></script>
+		
+		<!-- script for using google base layer -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCTN3rYFeoyUMSkukPyaCaW0DP9vvD9gbs"></script>
+		<script src="http://mapgears.github.io/ol3-google-maps/examples/dist/ol3gm.js"></script>
+		
+		<script src="test/cluster_test.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+				font-family:'Malgun Gothic';
+			}
+			#map {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			table {
+				border-collapse: collapse;
+				width: 240px;
+				
+			}
+			tr:nth-child(even) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				background: #f0f6f9;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+		</style>
+        <script>
+			
+			var clusters;
+			
+			function makeClusters(point_arr){
+								
+				var features = [];
+				// 만일 그 날짜에 해당하는 결과 Feature가 없을 경우, 전체 포인트를 반환.
+				if(point_arr.length==0){point_arr=points;}
+				for (var i = 0; i < point_arr.length; ++i) {
+				  var coordinates = [point_arr[i][2], point_arr[i][1]];
+				  var coordinates_t = ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857');
+				  features[i] = new ol.Feature(new ol.geom.Point(coordinates_t));
+				  features[i].set('when', point_arr[i][0]);
+				  features[i].set('type', point_arr[i][3]);
+				  features[i].set('addr', point_arr[i][4]);
+				}
+
+				var source = new ol.source.Vector({
+				  features: features
+				});
+
+				var clusterSource = new ol.source.Cluster({
+				  distance: 40,
+				  source: source
+				});
+
+				var styleCache = {};
+				var clusters = new ol.layer.Vector({
+				  name: 'cluster',
+				  source: clusterSource,
+				  style: function(feature, resolution) {
+					
+					if(feature){
+						var size = feature.get('features').length;
+						var style = styleCache[size];
+						if (!style) {
+						  style = [new ol.style.Style({
+							image: new ol.style.Circle({
+							  radius: 10,
+							  stroke: new ol.style.Stroke({
+								color: '#fff'
+							  }),
+							  fill: new ol.style.Fill({
+								color: '#3399CC'
+							  })
+							}),
+							text: new ol.style.Text({
+							  text: size.toString(),
+							  fill: new ol.style.Fill({
+								color: '#fff'
+							  })
+							})
+						  })];
+						  styleCache[size] = style;
+						}
+						return style;
+					}
+				  }
+				});
+				
+				return clusters;
+				
+			}
+			
+			function init() {
+				
+				$( "#datepicker" ).datepicker({
+					dateFormat: 'yy-mm-dd'
+				});
+				$( "#datepicker2" ).datepicker({
+					dateFormat: 'yy-mm-dd'
+				});
+				
+				clusters = makeClusters(points);
+				
+				var view = new ol.View({
+					center: [14136156.725025, 4512326.0353673],
+					zoom: 9
+				});
+				var map = new ol.Map({
+					interactions: olgm.interaction.defaults(),
+					layers: [
+					  new olgm.layer.Google()
+					],
+					target: 'map',
+					controls: ol.control.defaults({
+					  attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+						collapsible: false
+					  })
+					}),
+					view: view,
+					projection: 'EPSG:3857'
+				});
+				
+				
+				var olGM = new olgm.OLGoogleMaps({map: map}); // map is the ol.Map instance
+				
+				map.addLayer(clusters);
+				
+				
+				// 클러스터 클릭했을 때 숫자가 1이 아니면 줌 인, 1이면 정보 표출.
+				map.on('click', function(evt) {
+				  var feature = map.forEachFeatureAtPixel(evt.pixel, 
+								  function(feature) { return feature; });
+				  if(feature){
+				  var features = feature.get('features');
+					
+					if(features.length==1){
+						var type = features[0].get('type');
+						var when = features[0].get('when');
+						var addr = features[0].get('addr');
+						// div id=info 에 text를 지정한 text로 대체.
+						$('#when').text(when);
+						$('#addr').text(addr);
+					}
+					else{
+						map.getView().setZoom(map.getView().getZoom()+1);
+					}
+				  }
+					
+				});
+				
+				// 날짜별로 Features 화면에 표출
+				$("div > button").click(function () {
+					var point_arr = [];
+					if($("#date1").val()!="" && $("#date2").val()!=""){
+						for (var i = 0; i < points.length; ++i) {
+							var date = new Date(points[i][0]);
+							var stdate = new Date($("#date1").val());
+							var endate = new Date($("#date2").val());
+							
+							if(stdate<=date && endate>=date){
+								point_arr[point_arr.length] = points[i];
+								console.log(point_arr[point_arr.length-1]);
+							}
+							
+						}
+						
+						if(clusters != undefined){
+							clusters.getSource().clear();
+						}
+						
+						// removeLayer만 해서도 안 되고, clusters.getSource().clear()만 해서도 안됨(Source만 clear하면 줌변경시 Source겹침)
+						map.removeLayer(clusters);
+						clusters = makeClusters(point_arr);
+						map.addLayer(clusters);
+						
+					}else{
+						alert("시작일 및 종료일을 올바르게 입력해 주세요.");
+					}
+				});
+				
+				// active를 맨 나중에.(이벤트를 active 앞에)
+				olGM.activate();
+				
+			}
+		</script>
+    </head>
+    <body onload="init()">
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray;">
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<!--<div style="width: 100%; height: 100%; margin-bottom: 3px; background-color:  #0266c9; float: left; color: #fff; line-height: 40px; font-size: 17px;">재난정보</div>-->
+				<img src="img/new/11.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 62px;">
+				<!--<a href="#"><div style="width: 959px; height: 100%;"><img src="img/new/22_1.png"></div></a>
+				<a href="36_small_2.html"><div style="width: 959px; height: 100%;"><img src="img/new/22_2.png"></div></a>-->
+				<a href="#"><img src="img/new/22_1_1.png" style="width: 959px;"></a>
+				<a href="36_small_hd_windy.html"><img src="img/new/22_2_2.png" style="width: 959px; margin-left: -5px;"></a>
+			</div>
+			
+			<div style="width: 1918px; height: 937px; margin-top: 5px;">
+				<iframe src="http://210.92.123.150/windy/" scrolling="no" width="1915" height="937" frameborder="0"></iframe>
+			</div>
+			
+
+		</div>
+
+    </body>
+</html>
+
+
+
+
+
+

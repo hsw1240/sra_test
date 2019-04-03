@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="./css/news.css">
+<title>Naver News API Test</title>
+<script>
+// iframe 쓸때
+//<iframe seamless style="width:700px;" src="' + url + '"></iframe>
+
+// 건수 전역변수 초기화(기본 50건)
+var count = 50;
+var pageBlock = 5 ;
+var host = "http://"+window.location.hostname;
+var proxyUrl = host+"/sraproxy/sraproxy.aspx?url=" ;
+var sra_webservice = "http://1.227.166.166:9132/sracommon/sranews.asmx";
+var newGetService = sra_webservice  + "/getNaverNews?" ;
+var listCount = 10 ;
+
+
+$(document).ready(function(){
+
+	$('#BtnGo').on('click', function(){
+		count = $('#display option:selected').attr('value');
+		paging(1);
+		return false;
+	});
+
+	// 이전 버튼 클릭 시 페이징 번호 갱신
+	$('#prev').on('click', function(){
+		var startnum = parseInt($("ul.pagination #1").text());
+
+		if(startnum>pageBlock){
+			var start = startnum - pageBlock;
+			console.log(start);
+			paging(start);
+		}else{
+			alert("페이지의 처음입니다.");
+		}
+		return false;
+	});
+
+	// 다음 버튼 클릭 시 페이징 번호 갱신
+	$('#next').on('click', function(){
+		var startnum = parseInt($("ul.pagination #1").text());
+
+		if(startnum<(count/list)-(pageBlock-1)){
+			var start = startnum + pageBlock;
+			paging(start);
+		}else{
+			alert("설정된 조회 최대 건수를 초과하였습니다.");
+		}
+		return false;
+	});
+
+	// 페이지 클릭하면 페이지 갱신 후 active
+	$('ul.pagination li').on('click', function(){
+		var start = $(this).text();
+		sendToJsp(start);
+	});
+
+	var leftShow = false;
+
+	$("#toggleBtn").click(function(){
+
+		//$("#leftMenu").toggle('slide');
+		$("#leftMenu").toggle();
+
+		if(leftShow){
+
+			$("#toggleBtn").css('margin-left','0px');
+			$('#toggleBtn img').attr('src','img/right218.png');
+			leftShow = false;
+		}else{
+
+			$("#toggleBtn").css('margin-left','350px');
+			$('#toggleBtn img').attr('src','img/left207.png');
+			leftShow = true;
+		}
+	})
+
+});
+
+function getNewsData( start) {
+	var keyword, display, align;
+
+	 keyword = $('#word').val();
+	 display = listCount;
+	 align =  $('#align option:selected').attr('value');
+	 fromStart = start*listCount - (listCount-1) ;
+
+
+	$.ajax({
+		type: 'GET'
+		,  data :"json"
+		, url :  proxyUrl + encodeURIComponent( newGetService + 'keyword='+keyword +'&align='+align +'&display=' +display+'&start=' + fromStart )		
+		, success: function( data){
+			 // $("#test").html(data);
+			 makeNewsList(start, data);
+		}
+		, error: function(xhr, status, error) {
+			alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+		}
+	});
+}
+
+function makeNewsList(start,  data){
+	var jsonObj = JSON.parse( data );
+	var resultHtml;
+	$("#totalNews").html("총"+jsonObj.total+"건");
+ 	for(var i=0 ; i< jsonObj.items.length ; i++)
+ 	{
+ 		var date = jsonObj.items[i].pubDate;
+ 		var url = jsonObj.items[i].link;
+ 		var display = jsonObj.items[i].display;
+ 		var title = jsonObj.items[i].title;
+ 		//$( #date+i).html( getDate(date));
+ 		if ( i==0 && display!="2")
+ 			divOpen(url);
+ 		resultHtml +="<tr><td>";
+ 		resultHtml +="<div class='tdtitle'>";
+		resultHtml +="<a href='#' onclick='divOpen(\""+url+"\");' style='font-size:15px;'>";
+		resultHtml +="<nobr>"+title+"<b></b></nobr><br><div id='date"+i+"' class='date pull-left'>"+getDate(date )+ "</div>";
+		resultHtml +="</a>";
+		resultHtml +="</div>";
+
+	}
+	 $("#test").html(resultHtml);
+	 // 페이지 active
+	var id = (start%5)==0?5:(start%5);
+	$("ul.pagination li").attr('class','');
+	$("ul.pagination #"+id).attr('class','active');
+}
+
+function sendToJsp(start){
+	getNewsData(start);
+	/*
+	$.ajax({
+	    type : "POST",
+	    url : "newsTest.jsp",
+	    data :
+	    {
+	    	word: $('#word').val(),
+	    	display: 10,
+	    	align: $('#align option:selected').attr('value'),
+	    	start: start*10 - 9
+	    },
+	    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+	    error : function(request,status,error){
+	    	alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+	    },
+	    success : function(response){
+	        $("#test").html(response);
+	    }
+
+	});
+*/
+
+}
+
+function paging(start){
+
+	var start_num = start;
+	var count = 1;
+
+	for(var i=start_num; i<5+start_num; i++){
+		if(i==start){
+			$("ul.pagination #"+count).attr('class','active');
+			$("ul.pagination #"+count+" a").attr('onclick','sendToJsp('+i+')');
+			$("ul.pagination #"+count+" a").text(i);
+		}else{
+			$("ul.pagination #"+count+" a").attr('onclick','sendToJsp('+i+')');
+			$("ul.pagination #"+count+" a").text(i);
+		}
+		count++;
+	}
+
+	sendToJsp(start_num);
+
+
+}
+
+function getDate(date) {
+	var d = new Date(date);
+
+	year = d.getFullYear(),
+	month = (d.getMonth() + 1).toString(),
+	formatedMonth = (month.length === 1) ? ("0" + month) : month,
+	day = d.getDate().toString(),
+	formatedDay = (day.length === 1) ? ("0" + day) : day,
+	hour = d.getHours().toString(),
+	formatedHour = (hour.length === 1) ? ("0" + hour) : hour,
+	minute = d.getMinutes().toString(),
+	formatedMinute = (minute.length === 1) ? ("0" + minute) : minute,
+	second = d.getSeconds().toString(),
+	formatedSecond = (second.length === 1) ? ("0" + second) : second;
+
+	return year + "-" + formatedMonth + "-" + formatedDay + " " + formatedHour + ':' + formatedMinute + ':' + formatedSecond;
+}
+
+function divOpen(url){
+	$("#news").attr("src",url);
+}
+
+
+
+</script>
+</head>
+<body onload="getNewsData('1');">
+	<div id="ContentBox" style="width:1918px; height: 1077px; border: 1px solid gray;">
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<img src="img/new/66/66_title.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 62px;">
+				<a href="66_small_hd.html"><img src="img/new/66/66_tab_1_2.png" style="width: 959px;"></a>
+				<a href="#"><img src="img/new/66/66_tab_2_2.png" style="width: 959px; margin-left: -6px;"></a>
+			</div>
+		<!-- ContentBox를 Center로 -> margin:0 auto(좌우값을 오토로 줌) -->
+		<div id="leftMenu" style="width: 350px; height: 938px; background-color: #e8e8e8; float: left; position: absolute; z-index: 999; display: none;">
+			<form class="form-inline" style="text-align:center;" id="aForm" method=post>
+				<div style="width: 328px; height: 180px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<div style="text-align:left; margin-left: 15px;font-size: 15px;font-weight: bold; margin-top: 5px; width:100%;">상세 검색</div>
+					<div style="float:left; margin-top: 10px;">
+						<label for="word" style="font-size:13px; margin-left:15px;">검색</label>
+							<input type="text" class="form-control" id="word" style="width:230px; font-size:14px; margin:1px; height:30px;" placeholder="예) 홍수" value="">
+					</div>
+					<div style="float:left; margin-top: 10px;">
+						<label for="display" style="font-size:13px; margin-left:15px;">건수</label>
+							<select id="display" class="form-control" style="width:85px;font-size:14px; margin:1px;height:30px;">
+							<option value="50">50</option>
+							<option value="100">100</option>
+							<option value="150">150</option>
+							<option value="200">200</option>
+							</select>
+					</div>
+					<div style="float:left; margin-left: 9px; margin-top: 10px;">
+						<label for="align" style="font-size:13px; margin-left:15px;">정렬</label>
+							<select id="align" class="form-control" style="width:90px; font-size:14px; height:35px;">
+							<option value="sim">유사순</option>
+							<option value="date">최신순</option>
+						</select>
+					</div>
+				<button id="BtnGo" class="button button2" style="margin-left:178px; margin-top:20px;">확인</button>
+				</div>
+			</form>
+
+			<div style="width: 328px; height: 706px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;">
+					<div style="text-align:left; margin-left: 15px;font-size: 15px;font-weight: bold; margin-top: 5px; width:100%;">뉴스(news)정보
+					<span id="totalNews" style="margin-left:95px; font-size:13px; color:#555; font-weight: normal;"></span></div>
+				<div class="text-left">
+					<table id="test" class="table table-f table-hover table-striped" style="margin:5px; margin-top:20px;font-size:20px;">
+
+					</table>
+				</div>
+				<div class="text-center">
+				  <ul class="pagination" style="margin:-5px;">
+				    <li>
+				      <a href="#" id="prev">
+				        <span aria-hidden="true">&laquo;</span>
+				      </a>
+				    </li>
+				    <li id="1" class="active"><a href="#">1</a></li>
+				    <li id="2"><a href="#">2</a></li>
+				    <li id="3"><a href="#">3</a></li>
+				    <li id="4"><a href="#">4</a></li>
+				    <li id="5"><a href="#">5</a></li>
+				    <li>
+				      <a href="#" id="next">
+				        <span aria-hidden="true">&raquo;</span>
+				      </a>
+				    </li>
+				  </ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="toggleBtn" style="display: block;"><img src="img/right218.png"></div>
+
+		<div style="text-align: center; border: 1px solid;">
+			<iframe id="news" src="" frameborder="0"></iframe>
+		</div>
+	</div>
+</body>
+</html>

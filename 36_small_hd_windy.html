@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>X-net 36</title>
+        
+        <link rel="stylesheet" href="http://dev.openlayers.org/examples/style.css" type="text/css">
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="css/jqueryUI.css" type="text/css">
+		<script src="../js/jquery-1.11.0.min.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.css" type="text/css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.6.0/ol.js"></script>
+		
+		<link rel="stylesheet" href="css/ol_popup.css" type="text/css">
+		
+		<!-- script for using google base layer -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCTN3rYFeoyUMSkukPyaCaW0DP9vvD9gbs"></script>
+		<script src="http://mapgears.github.io/ol3-google-maps/examples/dist/ol3gm.js"></script>
+		
+		<script src="test/cluster_test_all.js"></script>
+		
+		<script src="js/todayjs.js"></script>
+		<script src="js/datePicker.js"></script>
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			body {
+				margin: 0px;
+				font-family:'Malgun Gothic';
+			}
+			#map {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+			<!-- 임시 0516 -->
+			#map1 {
+				width:1918px;
+				height:938px;
+				float: left;
+				z-index: 1;
+			}
+			.img {
+				width: 50px;
+				cursor: pointer;
+			}
+			.button {
+				background-color: #629fd9; /* Green */
+				border: none;
+				color: white;
+				padding: 3px 10px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 12px;
+				margin-left: 30px;
+				cursor: pointer;
+			}
+			.button1 {border-radius: 2px;}
+			.button2 {border-radius: 4px;}
+			.button3 {border-radius: 8px;}
+			.button4 {border-radius: 12px;}
+			.button5 {border-radius: 50%;}
+			table {
+				border-collapse: collapse;
+				border-radius: 15px;
+				width: 327px;
+				margin-left: 1px;
+			}
+			tr:nth-child(even) {background-color: #f2f2f2}
+			th {
+				color: #168;
+				padding: 3px;
+				font-weight: bold;
+			}
+			td {
+				text-align: left;
+				padding: 2px;
+				text-align: left;
+			}
+			
+			#toggleBtn {
+				width: 30px;
+				height: 80px;
+				top: 475px;
+				left: 0px;
+				position: absolute;
+				z-index: 1000;
+				cursor: pointer;
+				background-color: #ffffff;
+				border: 1px solid #a9bbdf;
+				border-bottom-right-radius: 10px;
+				border-top-right-radius: 10px;
+				line-height: 80px;
+				vertical-align: middle;
+			}
+			
+			.ol-dragbox {
+				background-color: rgba(255,255,255,0.4);
+				border-color: rgba(100,150,0,1);
+			}
+			
+			<!-- 선택목록 테이블 css -->
+			#clist {
+			  border-collapse: collapse;
+			  width: 311px;
+			}  
+			#clist th {
+			  padding: 10px;
+			  color: #168;
+			  border-bottom: 3px solid #168;
+			  text-align: left;
+			}
+			#clist td {
+			  color: #669;
+			  padding: 10px;
+			  border-bottom: 1px solid #ddd;
+			  cursor:pointer;
+			}
+			#clist tr:hover td {
+			  color: #004;
+			}
+			#marker {
+				width: 20px;
+				height: 20px;
+				border: 1px solid #088;
+				border-radius: 10px;
+				background-color: #ffd100;
+				opacity: 0.85;
+			}
+		</style>
+        <script>
+			
+			var clusters;
+			var clusterSource;
+			
+			var selectList = [];
+			
+			var map;
+			var view;
+			var googleLayer;
+			var olGM;
+			
+			var list;
+			
+			function makeClusters(point_arr){
+								
+				var features = [];
+				// 만일 그 날짜에 해당하는 결과 Feature가 없을 경우, 전체 포인트를 반환.
+				if(point_arr.length==0){point_arr=points;}
+				for (var i = 0; i < point_arr.length; ++i) {
+				  var coordinates = [point_arr[i][2], point_arr[i][1]];
+				  var coordinates_t = ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857');
+				  features[i] = new ol.Feature(new ol.geom.Point(coordinates_t));
+				  features[i].set('when', point_arr[i][0]);
+				  features[i].set('type', point_arr[i][3]);
+				  features[i].set('addr', point_arr[i][4]);
+				}
+
+				var source = new ol.source.Vector({
+				  features: features
+				});
+
+				clusterSource = new ol.source.Cluster({
+				  distance: 40,
+				  source: source
+				});
+
+				var styleCache = {};
+				var clusters = new ol.layer.Vector({
+				  name: 'cluster',
+				  source: clusterSource,
+				  style: function(feature, resolution) {
+					
+					if(feature){
+						var size = feature.get('features').length;
+						var style = styleCache[size];
+						if (!style) {
+						  style = [new ol.style.Style({
+							image: new ol.style.Circle({
+							  radius: 10,
+							  stroke: new ol.style.Stroke({
+								color: '#fff'
+							  }),
+							  fill: new ol.style.Fill({
+								color: '#3399CC'
+							  })
+							}),
+							text: new ol.style.Text({
+							  text: size.toString(),
+							  fill: new ol.style.Fill({
+								color: '#fff'
+							  })
+							})
+						  })];
+						  styleCache[size] = style;
+						}
+						return style;
+					}
+				  }
+				});
+				
+				return clusters;
+				
+			}
+			
+			// 지점으로 화면 이동, 1 테이블 정보 갱신
+			function goSpot(x, y, addr, when){
+				
+				// setCenter 대괄호 필수..
+				map.getView().setCenter([x, y]);
+				map.getView().setZoom(12);
+				
+				// marker 표시
+				$('#marker').attr('style','display:block;');
+				
+				// marker 오버레이
+				overlayPnt(x, y);
+								
+				// div id=info 에 text를 지정한 text로 대체.
+				$('#when').text(when);
+				$('#addr').text(addr);
+				
+			}
+			
+			// Marker overlay
+			function overlayPnt(x, y){
+				var pos = [x, y];
+				var marker = new ol.Overlay({
+					position: pos,
+					positioning: 'center-center',
+					element: document.getElementById('marker'),
+					stopEvent: false
+				});
+				
+				map.addOverlay(marker);
+			}
+			
+			
+			function init() {
+			
+				
+				$( "#datepicker" ).datepicker({
+					dateFormat: 'yy-mm-dd'
+				});
+				$( "#datepicker2" ).datepicker({
+					dateFormat: 'yy-mm-dd'
+				});
+				
+				clusters = makeClusters(points);
+				
+				view = new ol.View({
+					center: [14136156.725025, 4512326.0353673],
+					zoom: 9
+				});
+				
+				googleLayer = new olgm.layer.Google();
+				
+				map = new ol.Map({
+					interactions: ol.interaction.defaults(),
+					layers: [
+					  googleLayer
+					],
+					target: 'map',
+					controls: ol.control.defaults({
+					  attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+						collapsible: false
+					  })
+					}),
+					view: view,
+					projection: 'EPSG:3857'
+				});
+				
+				// google map on base
+				olGM = new olgm.OLGoogleMaps({map: map}); // map is the ol.Map instance
+				
+				// add cluster layer
+				map.addLayer(clusters);
+				
+				// 클러스터 클릭했을 때 숫자가 1이 아니면 줌 인, 1이면 정보 표출.
+				map.on('singleclick', function(evt) {
+					
+				  var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) { return feature; });
+				  
+				  if(feature){
+				  var features = feature.get('features');
+					
+					if(features.length==1){
+						var type = features[0].get('type');
+						var when = features[0].get('when');
+						var addr = features[0].get('addr');
+						// div id=info 에 text를 지정한 text로 대체.
+						$('#when').text(when);
+						$('#addr').text(addr);
+					}
+					else{
+						map.getView().setZoom(map.getView().getZoom()+1);
+					}
+				  }
+					
+				});
+				
+				// Drag Box and Select features 
+				var select = new ol.interaction.Select();
+				map.addInteraction(select);
+
+				var selectedFeatures = select.getFeatures();
+				
+				selectedFeatures.on(['add','remove'], function() {
+					var names = selectedFeatures.getArray().map(function(feature) {
+						return feature.get('features');
+					}); <!-- => feature 배열 -->
+					
+					// name에 [array(3), array(2)]와 같은 방식으로 cluster가 대입
+					// name의 각 인덱스에 각 features 존재
+					// 선택된게 없으면 전체 비움
+					if (names.length > 0) {
+						for(var i=0; i<names[names.length-1].length; i++){
+							var feat = names[names.length-1][i];
+							selectList.push([feat.get('type'), feat.get('addr'), feat.getGeometry().getCoordinates(), feat.get('when')]);
+						}
+					}else {
+						// 각 정보 초기화
+						selectList = [];
+						list = "";
+						// 목록 제거
+						$("#clist").empty();
+						// 마커 제거
+						$('#marker').attr('style','display:none;');
+					}
+					
+				});
+
+				// a DragBox interaction used to select features by drawing boxes
+				var dragBox = new ol.interaction.DragBox({
+					condition: ol.events.condition.platformModifierKeyOnly
+				});
+
+				map.addInteraction(dragBox);
+
+				dragBox.on('boxend', function(evt) {
+					// features that intersect the box are added to the collection of
+					// selected features
+					
+					var extent = dragBox.getGeometry().getExtent();
+					clusterSource.forEachFeatureIntersectingExtent(extent, function(feature) {
+						selectedFeatures.push(feature);
+					});
+					
+					// selectList 0~3 , 순서대로 재난유형, 주소, 좌표, 재난발생일시
+					for(var i=0; i<selectList.length; i++){
+						list = list + "<tr>" + "<td>" + selectList[i][0] + "</td>"
+								<!-- + "<a href=\"#\" onClick=\"goSpot(" + selectList[i][2] + ");\">" -->
+								+ "<td onClick=\"goSpot(" + selectList[i][2] + ", '"+ selectList[i][1] + "', '" + selectList[i][3] + "');\">" + selectList[i][1] + "</td></tr>";
+						
+					}
+					
+					$("#clist").html(list);
+					
+					
+				});
+				
+				// clear selection when drawing a new box and when clicking on the map
+				dragBox.on('boxstart', function() {
+					selectedFeatures.clear();
+				});
+				
+				
+				
+				// 날짜별로 Features 화면에 표출
+				$("div > button").click(function () {
+					var point_arr = [];
+					if($("#date1").val()!="" && $("#date2").val()!=""){
+						for (var i = 0; i < points.length; ++i) {
+							var date = new Date(points[i][0]);
+							var stdate = new Date($("#date1").val());
+							var endate = new Date($("#date2").val());
+							
+							if(stdate<=date && endate>=date){
+								point_arr[point_arr.length] = points[i];
+								console.log(point_arr[point_arr.length-1]);
+							}
+							
+						}
+						
+						if(clusters != undefined){
+							clusters.getSource().clear();
+						}
+						
+						// removeLayer만 해서도 안 되고, clusters.getSource().clear()만 해서도 안됨(Source만 clear하면 줌변경시 Source겹침)
+						map.removeLayer(clusters);
+						clusters = makeClusters(point_arr);
+						map.addLayer(clusters);
+						
+					}else{
+						alert("시작일 및 종료일을 올바르게 입력해 주세요.");
+					}
+				});
+				
+				// active를 맨 나중에.(이벤트를 active 앞에)
+				olGM.activate();
+				
+			}
+		</script>
+    </head>
+    <body onload="init()">
+		<div class="centerDiv" style="width:1918px; height: 1077px; border: 1px solid gray;">
+			<div style="width: 1918px; height: 72px; text-align: center;">
+				<!--<div style="width: 100%; height: 100%; margin-bottom: 3px; background-color:  #0266c9; float: left; color: #fff; line-height: 40px; font-size: 17px;">재난정보</div>-->
+				<img src="img/new/11.png" style="width: 1918px;">
+			</div>
+			<div style="width: 1918px; height: 67px;">
+				<!--<a href="#"><div style="width: 959px; height: 100%;"><img src="img/new/22_1.png"></div></a>
+				<a href="36_small_2.html"><div style="width: 959px; height: 100%;"><img src="img/new/22_2.png"></div></a>-->
+				<a href="36_small_hd.html"><img src="img/new/22_1.png" style="width: 959px;"></a>
+				<a href="#"><img src="img/new/22_2.png" style="width: 959px; margin-left: -5px;"></a>
+			</div>
+			<!-- TEMP 0516 -->
+			<!-- <div id="leftMenu" style="width: 350px; height: 938px; background-color: #e8e8e8; float: left; position: absolute; z-index: 999; display: none;"> -->
+				
+				<!-- <div style="width: 328px; height: 180px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;"> -->
+					<!-- <!--<div style="height: 18px; background-color: #1c3aa6; color: #fff; font-size: 10px; line-height: 18px;">제어 창</div>-->
+					<!-- <div style="height: 25px; margin-top: 20px;"><span style="float: left; margin-left: 15px; font-size: 14px; font-weight: bold;">날짜 선택</span></div> -->
+					
+					<!-- <div style="font-size: 11px; margin-top: 10px; width: 230px; text-align: left; margin-left: 15px;"> -->
+						<!-- <div style="height: 35px;"> -->
+							<!-- <input type="text" name="yyyy1" value="년도" style="width: 80px; height: 25px;"> -->
+							<!-- <input type="text" name="mm1" value="월" style="width: 40px; height: 25px;"> -->
+							<!-- <input type="text" name="dd1" value="일" style="width: 40px; height: 25px;" style="margin-right: 5px;"> -->
+							<!-- <input type="hidden" id="datepicker1"> ~ -->
+						<!-- </div> -->
+						<!-- <div style="height: 35px; margin-top: 5px;"> -->
+							<!-- <input type="text" name="yyyy2" value="년도" style="width: 80px; height: 25px;"> -->
+							<!-- <input type="text" name="mm2" value="월" style="width: 40px; height: 25px;"> -->
+							<!-- <input type="text" name="dd2" value="일" style="width: 40px; height: 25px;"> -->
+							<!-- <input type="hidden" id="datepicker2"> -->
+						<!-- </div> -->
+					<!-- </div> -->
+					
+					<!-- <input type="hidden" id="date1"> -->
+					<!-- <input type="hidden" id="date2"> -->
+
+					<!-- <div style="float: right; margin-top: 3px; margin-right: 25px;"> -->
+						<!-- <button id="dateBtId" class="button button2">적용</button> -->
+					<!-- </div> -->
+					
+				<!-- </div> -->
+				<!-- <div style="width: 328px; height: 530px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;"> -->
+						<!-- <table> -->
+						<!-- <tr> -->
+							<!-- <th width="80" height="50">발생시점</th> -->
+							<!-- <td id="when" height="50" width="170"></td> -->
+						<!-- </tr> -->
+						<!-- <tr> -->
+							<!-- <th width="80" height="50">위치</th> -->
+							<!-- <td id="addr" height="50" width="170"></td> -->
+						<!-- </tr> -->
+						<!-- </table> -->
+						
+					<!-- <div style="height:25px; background-color: #3399cc; color: #fff; font-size: 15px; line-height: 18px;margin-top:3px;margin-bottom:3px;">▶ 선택 지점 목록</div> -->
+						
+						<!-- <div style="height: 375px;overflow-y: auto;overflow-x: hidden;"> -->
+							<!-- <table id="clist"> -->
+							<!-- </table> -->
+						<!-- </div> -->
+				<!-- </div> -->
+				<!-- <div style="width: 328px; height: 160px; border: 1px solid #000; margin: 10px; margin-top: 15px; background-color: #fff; border-radius: 15px;"> -->
+					<!-- <img src="./img/16_weather.png" style="width: 328px; border-radius: 15px;"> -->
+				<!-- </div> -->
+			<!-- </div> -->
+			
+			<!-- <div id="toggleBtn" style="display: block;"><img src="img/right218.png" style="margin-left: 5px;"></div> -->
+			
+			<!-- Temp Iframe for 0516 -->
+			<div id="map1" style="height:938px;">
+				<iframe src="http://210.92.123.156/paid_templete/cluster_temp_beforeSizeAdjust.html" frameborder="0" style="overflow:hidden;height:100%;width:100%" scrolling=no height="100%" width="99%"></iframe>
+			</div>
+			<!-- <div id="map"></div> -->
+			<div id="marker" title="Marker" style="display:none;"></div>
+		</div>
+		<script>
+		
+			
+			$("input[name$='yyyy1']").val(yyyy);
+			$("input[name$='mm1']").val(mm);
+			$("input[name$='dd1']").val(dd);
+
+			$("input[name$='yyyy2']").val(yyyy);
+			$("input[name$='mm2']").val(mm);
+			$("input[name$='dd2']").val(dd);
+			
+			$("#datepicker1").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date1").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy1']").val(yymmdd[0]);
+					$("input[name$='mm1']").val(yymmdd[1]);
+					$("input[name$='dd1']").val(yymmdd[2]);
+				}
+			});
+			$("#datepicker2").datepicker({
+				showOn: "both", 
+				buttonImage: "img/calendar.png", 
+				buttonImageOnly: true,
+				dateFormat: 'yy-mm-dd',
+				onSelect: function(dateText, inst) {
+					$("#date2").val(dateText);
+					var yymmdd = dateText.split("-")
+					$("input[name$='yyyy2']").val(yymmdd[0]);
+					$("input[name$='mm2']").val(yymmdd[1]);
+					$("input[name$='dd2']").val(yymmdd[2]);
+				}
+			});
+			
+			// 레이아웃 제어 left show hide
+			var leftShow = false;
+			$("#toggleBtn").click(function(){
+				
+				//$("#leftMenu").toggle('slide');
+				$("#leftMenu").toggle();
+				
+				if(leftShow){
+					
+					$("#toggleBtn").css('margin-left','0px');
+					$('#toggleBtn img').attr('src','img/right218.png');
+					leftShow = false;
+				}else{
+					
+					$("#toggleBtn").css('margin-left','350px');
+					$('#toggleBtn img').attr('src','img/left207.png');
+					leftShow = true;
+				}
+			})
+		</script>
+    </body>
+</html>
+
+
+
+
+
+
